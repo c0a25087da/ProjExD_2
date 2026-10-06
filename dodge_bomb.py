@@ -82,8 +82,6 @@ def main():
     bb_rct = bb_img.get_rect()  # 爆弾のRCT
     bb_rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT)  #横座標と縦座標の乱数
     vx, vy = +5, +5  # 赤い爆弾の移動量  
-    
-    
     clock = pg.time.Clock()
     tmr = 0
     while True:
@@ -124,6 +122,7 @@ def main():
         if not tate:  # tate == False
             vy *= -1
         screen.blit(bb_img, bb_rct)  # 練習2赤い爆弾の表示
+        
         pg.display.update()
         tmr += 1
         clock.tick(50)
