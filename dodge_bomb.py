@@ -1,7 +1,7 @@
 import os
-import sys
 import pygame as pg
 import random
+import sys
 import time
 
 
