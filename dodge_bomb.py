@@ -43,8 +43,29 @@ def gameover(screen: pg.Surface) -> None:
     screen.blit(go_img, [0,0])
     pg.display.update()
     time.sleep(5)
-    
 
+
+def get_kk_imgs() -> dict[tuple[int, int], pg.Surface]:
+    """
+    引数：なし
+    戻り値：rotozoomしたSurfaceを値とした辞書を返す
+    こうかとんの移動に伴った画像切り替え
+    """
+    kk_img = pg.image.load("fig/3.png") 
+    kk_reverse = pg.transform.flip(kk_img, True, False) 
+    kk_dict = {
+        (0, 0): pg.transform.rotozoom(kk_img, 0, 1.0),
+        (+5, 0): pg.transform.rotozoom(kk_reverse, 0, 1.0),
+        (+5, -5):pg.transform.rotozoom(kk_reverse, 45, 1.0),
+        (0, -5):pg.transform.rotozoom(kk_reverse, 90, 1.0),
+        (+5, +5):pg.transform.rotozoom(kk_reverse, -45, 1.0),
+        (0, +5):pg.transform.rotozoom(kk_reverse, -90, 1.0),
+        (-5, 0):pg.transform.rotozoom(kk_img, 0, 1.0),
+        (-5, -5):pg.transform.rotozoom(kk_img, -45, 1.0),
+        (-5, +5):pg.transform.rotozoom(kk_img, 45, 1.0),
+    }
+    
+    return kk_dict
 
 
 def main():
@@ -52,6 +73,7 @@ def main():
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     bg_img = pg.image.load("fig/pg_bg.jpg")    
     kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
+    kk_imgs = get_kk_imgs()
     kk_rct = kk_img.get_rect()
     kk_rct.center = 300, 200
     bb_img = pg.Surface((20, 20))  # 空のSurface
@@ -60,6 +82,7 @@ def main():
     bb_rct = bb_img.get_rect()  # 爆弾のRCT
     bb_rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT)  #横座標と縦座標の乱数
     vx, vy = +5, +5  # 赤い爆弾の移動量  
+    
     
     clock = pg.time.Clock()
     tmr = 0
@@ -88,6 +111,7 @@ def main():
                 sum_mv[0] += tpl[0]  # 横方向の移動量
                 sum_mv[1] += tpl[1]  # 縦方向の移動量
                 
+        kk_img = kk_imgs[tuple(sum_mv)]
         kk_rct.move_ip(sum_mv)
         if check_bound(kk_rct) != (True, True):  # どこかしらはみ出てる
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])  # 先ほどの動きをキャンセルする
