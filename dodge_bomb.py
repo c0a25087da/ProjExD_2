@@ -9,6 +9,20 @@ DELTA = {pg.K_UP:(0, -5), pg.K_DOWN:(0, +5), pg.K_LEFT:(-5, 0), pg.K_RIGHT:(+5, 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
+def check_bound(rect: pg.Rect) -> tuple[bool, bool]:
+    """
+    引数:こうかとんまたは爆弾のRect
+    戻り値：タプル（横方向の判定結果, 縦方向の判定結果）
+    画面内ならTrue/画面外ならFalse
+    """
+    yoko, tate = True, True
+    if rect.left < 0 or WIDTH < rect.right:
+        yoko = False
+    if rect.top < 0 or HEIGHT < rect.bottom:
+        tate = False
+    
+    return yoko, tate
+
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -22,7 +36,7 @@ def main():
     bb_img.set_colorkey((0, 0, 0))  # 赤い爆弾の四隅を透過
     bb_rct = bb_img.get_rect()  # 爆弾のRCT
     bb_rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT)  #横座標と縦座標の乱数
-    vx, vy = +5, +5  #赤い爆弾の移動量  
+    vx, vy = +5, +5  # 赤い爆弾の移動量  
     
     clock = pg.time.Clock()
     tmr = 0
@@ -48,8 +62,16 @@ def main():
                 sum_mv[1] += tpl[1]  # 縦方向の移動量
                 
         kk_rct.move_ip(sum_mv)
-        bb_rct.move_ip(vx, vy)  # 赤い爆弾の移動
+        if check_bound(kk_rct) != (True, True):  # どこかしらはみ出てる
+            kk_rct.move_ip(-sum_mv[0], -sum_mv[1])  # 先ほどの動きをキャンセルする
         screen.blit(kk_img, kk_rct)
+        
+        bb_rct.move_ip(vx, vy)  # 赤い爆弾の移動
+        yoko, tate = check_bound(bb_rct)
+        if not yoko:  # yoko == False
+            vx *= -1
+        if not tate:  # tate == False
+            vy *= -1
         screen.blit(bb_img, bb_rct)  # 練習2赤い爆弾の表示
         pg.display.update()
         tmr += 1
